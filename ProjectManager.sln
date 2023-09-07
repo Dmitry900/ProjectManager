@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectManager.Domain", "Pr
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "project-manager-frontend", "project-manager-frontend\project-manager-frontend.esproj", "{ADB79CFE-2FA6-48D4-8D12-2F019A36BC9F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F8F3CE1D-1374-4BC7-AB4D-04745B8AEA87}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{9B559C97-9922-4468-8C72-614953B358C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +36,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4E50C703-0A35-424D-9726-84F1D2A02BFA} = {F8F3CE1D-1374-4BC7-AB4D-04745B8AEA87}
+		{AAFD6586-CDFD-46E1-8136-C13AAEFEB639} = {F8F3CE1D-1374-4BC7-AB4D-04745B8AEA87}
+		{ADB79CFE-2FA6-48D4-8D12-2F019A36BC9F} = {F8F3CE1D-1374-4BC7-AB4D-04745B8AEA87}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7ADA5762-B005-4ED7-8915-BEF698A86DD3}
