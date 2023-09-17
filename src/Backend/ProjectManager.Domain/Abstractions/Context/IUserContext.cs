@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectManager.Domain.Entities;
 
-namespace ProjectManager.Domain.Context
+namespace ProjectManager.Domain.Abstractions.Context
 {
     public interface IUserContext
     {

@@ -2,5 +2,6 @@
 {
     public class UserEntity
     {
+        public Guid UserId { get; set; }
     }
 }
