@@ -4,11 +4,10 @@ namespace ProjectManager.Domain.Abstractions.Services
 {
     public interface ITaskService
     {
-        public Task CreateAsync(TaskModel task);
-        public Task DeleteAsync(Guid taskId);
-        public Task AddRecordsAsync(IEnumerable<TaskModel> tasks);
-
-        public Task AddRecordAsync(TaskModel task);
-        public Task RemoveRecordAsync(Guid recordId);
+        public Task CreateAsync(TaskModel task, CancellationToken cancellationToken);
+        public Task DeleteAsync(Guid taskId, CancellationToken cancellationToken);
+        public Task AddRecordsAsync(Guid taskId, IEnumerable<RecordModel> records, CancellationToken cancellationToken);
+        public Task AddRecordAsync(Guid taskId, RecordModel record, CancellationToken cancellationToken);
+        public Task RemoveRecordAsync(Guid taskId, Guid recordId, CancellationToken cancellationToken);
     }
 }
