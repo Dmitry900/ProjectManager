@@ -4,6 +4,7 @@ namespace ProjectManager.Domain.Abstractions.Services
 {
     public interface IUserService
     {
-        Task CreateUserAsync(UserModel user);
+        Task CreateUserAsync(UserModel user, CancellationToken cancellationToken);
+        Task<UserModel> GetUserAsync(Guid userId, CancellationToken cancellationToken);
     }
 }

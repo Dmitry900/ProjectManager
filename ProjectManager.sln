@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectManager.Domain", "sr
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "project-manager-frontend", "src\Frontend\project-manager-frontend\project-manager-frontend.esproj", "{3302A77C-EC62-42D7-B41B-9CAB9007F186}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectManager.Domain.Tests", "ProjectManager.Domain.Tests\ProjectManager.Domain.Tests.csproj", "{10BF7F41-676F-41C0-8DE9-78242C86E4BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{3302A77C-EC62-42D7-B41B-9CAB9007F186}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3302A77C-EC62-42D7-B41B-9CAB9007F186}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3302A77C-EC62-42D7-B41B-9CAB9007F186}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{10BF7F41-676F-41C0-8DE9-78242C86E4BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10BF7F41-676F-41C0-8DE9-78242C86E4BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10BF7F41-676F-41C0-8DE9-78242C86E4BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10BF7F41-676F-41C0-8DE9-78242C86E4BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -47,6 +53,7 @@ Global
 		{F967DB1B-8100-4843-A7B6-AFC6D54E3D3F} = {0E3A32B4-8152-40E1-B6FC-29A0DEF00DB8}
 		{1E52CCAD-4F6F-437D-A486-EA87CC2842A6} = {0E3A32B4-8152-40E1-B6FC-29A0DEF00DB8}
 		{3302A77C-EC62-42D7-B41B-9CAB9007F186} = {0579AE92-5797-4042-8D1D-CD0BF73B6BE4}
+		{10BF7F41-676F-41C0-8DE9-78242C86E4BB} = {9B559C97-9922-4468-8C72-614953B358C8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7ADA5762-B005-4ED7-8915-BEF698A86DD3}
