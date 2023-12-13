@@ -1,29 +1,44 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ProjectManager.Domain.Context;
+using ProjectManager.Domain.Extensions;
+using ProjectManager.Domain.UnitOfWork;
 
 namespace ProjectManager.Domain.Tests
 {
-    public class TestBase : IAsyncLifetime
+    public abstract class TestBase : IAsyncLifetime
     {
         readonly ServiceProvider serviceProvider;
 
         public IServiceProvider Services => serviceProvider;
+        public IUnitOfWork UnitOfWork { get; }
 
         public TestBase()
         {
             var services = new ServiceCollection();
 
-            services.AddDbContext<ApplicationContext>();
-            // ToDo : Make datbase fixture and inject it into this class
+            services.AddDbContext<ApplicationContext>(options => options.UseInMemoryDatabase("test"));
+            services.AddSingleton<IUnitOfWork, Domain.UnitOfWork.UnitOfWork>();
+            services.AddProjectManager();
 
             serviceProvider = services.BuildServiceProvider();
         }
+
+        #region Abstract 
+
+        public virtual void OnConfigure(IServiceCollection services)
+        {
+
+        }
+
+        #endregion
+
 
         #region IAsyncLifetime members
 
         public Task InitializeAsync()
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public async Task DisposeAsync()

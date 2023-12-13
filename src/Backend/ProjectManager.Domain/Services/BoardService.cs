@@ -1,19 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ProjectManager.Domain.Abstractions.Context;
-using ProjectManager.Domain.Abstractions.Services;
+﻿using ProjectManager.Domain.Abstractions.Services;
 using ProjectManager.Domain.Entities;
 using ProjectManager.Domain.Models;
+using ProjectManager.Domain.UnitOfWork;
 
 namespace ProjectManager.Domain.Services
 {
-    internal class BoardService : IBoardService
+    internal class BoardService(IUnitOfWork unitOfWork) : IBoardService
     {
-        readonly DbSet<BoardEntity> boards;
-
-        public BoardService(IBoardContext boardContext)
-        {
-            boards = boardContext.Boards ?? throw new ArgumentNullException(nameof(boardContext));
-        }
+        readonly IGenericRepository<BoardEntity> boardRepository = unitOfWork.BoardRepository ?? throw new ArgumentNullException(nameof(unitOfWork));
 
         #region IBoardService members
 
@@ -25,34 +19,36 @@ namespace ProjectManager.Domain.Services
                 UserId = board.UserId,
                 Name = board.Name,
             };
-            await boards.AddAsync(entity, cancellationToken);
+            await boardRepository.InsertAsync(entity, cancellationToken);
         }
 
         public async Task DeleteAsync(Guid boardId, CancellationToken cancellationToken)
         {
-            var board = await GetBoardAsync(boardId, cancellationToken);
-            boards.Remove(board);
+            await boardRepository.DeleteAsync(boardId, cancellationToken);
         }
 
         public async Task AddStatusAsync(Guid boardId, string status, CancellationToken cancellationToken)
         {
             var board = await GetBoardAsync(boardId, cancellationToken);
-            board.Statuses.Add(status);
+            board.Statuses = [.. board.Statuses, status];
+            await boardRepository.UpdateAsync(board, cancellationToken);
         }
 
         public async Task RemoveStatusAsync(Guid boardId, string status, CancellationToken cancellationToken)
         {
             var board = await GetBoardAsync(boardId, cancellationToken);
-            board.Statuses.Remove(status);
+            board.Statuses = board.Statuses.Where(it => it != status).ToArray();
+            await boardRepository.UpdateAsync(board, cancellationToken);
         }
 
         public async Task<IEnumerable<BoardModel>> GetAllTasksAsync(Guid boardId, CancellationToken cancellationToken)
         {
-            return await boards.Where(it => it.BoardId == boardId).Select(it => new BoardModel(it.UserId, it.Name)).ToListAsync(cancellationToken);
+            var boards = await boardRepository.GetAsync(it => it.BoardId == boardId, cancellationToken: cancellationToken);
+            return boards.Select(it => new BoardModel(it.UserId, it.Name));
         }
 
         #endregion
 
-        Task<BoardEntity> GetBoardAsync(Guid boardId, CancellationToken cancellationToken) => boards.FirstOrDefaultAsync(it => it.BoardId == boardId, cancellationToken);
+        Task<BoardEntity> GetBoardAsync(Guid boardId, CancellationToken cancellationToken) => boardRepository.GetByIdAsync(boardId, cancellationToken);
     }
 }

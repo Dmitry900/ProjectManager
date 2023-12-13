@@ -3,66 +3,54 @@ using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Domain.UnitOfWork
 {
-    public class UnitOfWork : IDisposable
+    public class UnitOfWork(IServiceProvider provider, ApplicationContext context) : IUnitOfWork, IDisposable
     {
-        private ApplicationContext context;
-        private GenericRepository<BoardEntity> boardRepository;
-        private GenericRepository<TaskEntity> taskRepository;
-        private GenericRepository<UserEntity> userRepository;
-        private GenericRepository<RecordEntity> recordRepository;
+        readonly IServiceProvider provider = provider;
+        readonly ApplicationContext context = context;
+        private IGenericRepository<BoardEntity> boardRepository;
+        private IGenericRepository<TaskEntity> taskRepository;
+        private IGenericRepository<UserEntity> userRepository;
+        private IGenericRepository<RecordEntity> recordRepository;
 
-        public GenericRepository<BoardEntity> BoardRepository
+        public IGenericRepository<BoardEntity> BoardRepository
         {
             get
             {
-
-                if (boardRepository == null)
-                {
-                    boardRepository = new GenericRepository<BoardEntity>(context);
-                }
+                boardRepository ??= new GenericRepository<BoardEntity>(context);
                 return boardRepository;
             }
         }
-        public GenericRepository<TaskEntity> TaskRepository
+        public IGenericRepository<TaskEntity> TaskRepository
         {
             get
             {
 
-                if (taskRepository == null)
-                {
-                    taskRepository = new GenericRepository<TaskEntity>(context);
-                }
+                taskRepository ??= new GenericRepository<TaskEntity>(context);
                 return taskRepository;
             }
         }
-        public GenericRepository<UserEntity> UserRepository
+        public IGenericRepository<UserEntity> UserRepository
         {
             get
             {
 
-                if (userRepository == null)
-                {
-                    userRepository = new GenericRepository<UserEntity>(context);
-                }
+                userRepository ??= new GenericRepository<UserEntity>(context);
                 return userRepository;
             }
         }
-        public GenericRepository<RecordEntity> RecordRepository
+        public IGenericRepository<RecordEntity> RecordRepository
         {
             get
             {
 
-                if (recordRepository == null)
-                {
-                    recordRepository = new GenericRepository<RecordEntity>(context);
-                }
+                recordRepository ??= new GenericRepository<RecordEntity>(context);
                 return recordRepository;
             }
         }
 
-        public async Task SaveAsync()
+        public async Task SaveAsync(CancellationToken cancellationToken)
         {
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         #region IDisposable members
@@ -71,14 +59,14 @@ namespace ProjectManager.Domain.UnitOfWork
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!disposed)
             {
                 if (disposing)
                 {
                     context.Dispose();
                 }
             }
-            this.disposed = true;
+            disposed = true;
         }
 
         public void Dispose()
@@ -88,5 +76,14 @@ namespace ProjectManager.Domain.UnitOfWork
         }
 
         #endregion
+    }
+
+    public interface IUnitOfWork
+    {
+        IGenericRepository<BoardEntity> BoardRepository { get; }
+        IGenericRepository<TaskEntity> TaskRepository { get; }
+        IGenericRepository<UserEntity> UserRepository { get; }
+        IGenericRepository<RecordEntity> RecordRepository { get; }
+        Task SaveAsync(CancellationToken cancellationToken);
     }
 }

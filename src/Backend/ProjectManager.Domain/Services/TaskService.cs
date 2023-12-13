@@ -1,21 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ProjectManager.Domain.Abstractions.Context;
-using ProjectManager.Domain.Abstractions.Services;
+﻿using ProjectManager.Domain.Abstractions.Services;
 using ProjectManager.Domain.Entities;
 using ProjectManager.Domain.Models;
+using ProjectManager.Domain.UnitOfWork;
 
 namespace ProjectManager.Domain.Services
 {
-    internal class TaskService : ITaskService
+    internal class TaskService(IUnitOfWork unitOfWork) : ITaskService
     {
-        readonly DbSet<TaskEntity> tasks;
-        readonly DbSet<RecordEntity> records;
-
-        public TaskService(IBoardContext boardContext)
-        {
-            tasks = boardContext.Tasks ?? throw new ArgumentNullException(nameof(boardContext));
-            records = boardContext.Records ?? throw new ArgumentNullException(nameof(boardContext));
-        }
+        readonly IGenericRepository<TaskEntity> taskRepository = unitOfWork.TaskRepository ?? throw new ArgumentNullException(nameof(unitOfWork));
+        readonly IGenericRepository<RecordEntity> recordRepository = unitOfWork.RecordRepository ?? throw new ArgumentNullException(nameof(unitOfWork));
 
         #region ITaskService members
 
@@ -25,16 +18,15 @@ namespace ProjectManager.Domain.Services
             {
                 TaskId = Guid.NewGuid()
             };
-            await tasks.AddAsync(entity, cancellationToken);
+            await taskRepository.InsertAsync(entity, cancellationToken);
         }
 
-        public async Task DeleteAsync(Guid taskId, CancellationToken cancellationToken)
+        public Task DeleteAsync(Guid taskId, CancellationToken cancellationToken)
         {
-            var task = await GetTaskAsync(taskId, cancellationToken);
-            tasks.Remove(task);
+            return taskRepository.DeleteAsync(taskId, cancellationToken);
         }
 
-        public async Task AddRecordAsync(Guid taskId, RecordModel record, CancellationToken cancellationToken)
+        public Task AddRecordAsync(Guid taskId, RecordModel record, CancellationToken cancellationToken)
         {
             var entity = new RecordEntity
             {
@@ -43,7 +35,7 @@ namespace ProjectManager.Domain.Services
                 Text = record.Text,
                 Type = record.Type
             };
-            await records.AddAsync(entity, cancellationToken);
+            return recordRepository.InsertAsync(entity, cancellationToken);
         }
 
         public async Task AddRecordsAsync(Guid taskId, IEnumerable<RecordModel> records, CancellationToken cancellationToken)
@@ -57,19 +49,16 @@ namespace ProjectManager.Domain.Services
                     Text = record.Text,
                     Type = record.Type
                 };
-                await this.records.AddAsync(entity, cancellationToken);
+
+                await recordRepository.InsertAsync(entity, cancellationToken);
             }
         }
 
-        public async Task RemoveRecordAsync(Guid taskId, Guid recordId, CancellationToken cancellationToken)
+        public Task RemoveRecordAsync(Guid taskId, Guid recordId, CancellationToken cancellationToken)
         {
-            var record = await GetRecordAsync(recordId, cancellationToken);
-            records.Remove(record);
+            return recordRepository.DeleteAsync(recordId, cancellationToken);
         }
 
         #endregion
-
-        Task<TaskEntity> GetTaskAsync(Guid taskId, CancellationToken cancellationToken) => tasks.FirstOrDefaultAsync(it => it.TaskId == taskId, cancellationToken);
-        Task<RecordEntity> GetRecordAsync(Guid recordId, CancellationToken cancellationToken) => records.FirstOrDefaultAsync(it => it.RecordId == recordId, cancellationToken);
     }
 }

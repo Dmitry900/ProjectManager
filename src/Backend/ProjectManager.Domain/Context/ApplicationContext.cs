@@ -6,6 +6,7 @@ namespace ProjectManager.Domain.Context
 {
     public class ApplicationContext : DbContext, IBoardContext, IUserContext
     {
+        public ApplicationContext() { }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
             Database.EnsureCreated();
@@ -29,7 +30,7 @@ namespace ProjectManager.Domain.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;Database=SchoolDB;Trusted_Connection=True;");
+            //optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;Database=SchoolDB;Trusted_Connection=True;");
         }
 
         #endregion

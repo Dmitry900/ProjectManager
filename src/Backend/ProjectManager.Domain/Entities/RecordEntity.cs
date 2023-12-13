@@ -1,7 +1,10 @@
-﻿namespace ProjectManager.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjectManager.Domain.Entities
 {
     public class RecordEntity
     {
+        [Key]
         public Guid RecordId { get; set; }
         public Guid TaskId { get; set; }
         public string Text { get; set; }
