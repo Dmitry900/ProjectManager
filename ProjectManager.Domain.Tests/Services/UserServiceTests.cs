@@ -29,7 +29,7 @@ namespace ProjectManager.Domain.Tests.Services
             Assert.Single(users);
             var user = users.Single();
             Assert.Equal("Name", user.Name);
-            Assert.Equal("123", user.Name);
+            Assert.Equal("123", user.Pass);
         }
 
         #endregion

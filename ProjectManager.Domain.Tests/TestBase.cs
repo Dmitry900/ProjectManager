@@ -22,6 +22,7 @@ namespace ProjectManager.Domain.Tests
             services.AddProjectManager();
 
             serviceProvider = services.BuildServiceProvider();
+            UnitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
         }
 
         #region Abstract 
