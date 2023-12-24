@@ -6,5 +6,7 @@ namespace ProjectManager.Domain.Entities
     {
         [Key]
         public Guid TaskId { get; set; }
+        public Guid BoardId { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -12,13 +12,17 @@ namespace ProjectManager.Domain.Services
 
         #region ITaskService members
 
-        public async Task CreateAsync(TaskModel task, CancellationToken cancellationToken)
+        public async Task<TaskEntity> CreateAsync(TaskModel task, CancellationToken cancellationToken)
         {
             var entity = new TaskEntity
             {
-                TaskId = Guid.NewGuid()
+                TaskId = Guid.NewGuid(),
+                BoardId = task.BoardId,
+                Name = task.Name
             };
             await taskRepository.InsertAsync(entity, cancellationToken);
+
+            return entity;
         }
 
         public Task DeleteAsync(Guid taskId, CancellationToken cancellationToken)
@@ -26,7 +30,7 @@ namespace ProjectManager.Domain.Services
             return taskRepository.DeleteAsync(taskId, cancellationToken);
         }
 
-        public Task AddRecordAsync(Guid taskId, RecordModel record, CancellationToken cancellationToken)
+        public async Task<RecordEntity> AddRecordAsync(Guid taskId, RecordModel record, CancellationToken cancellationToken)
         {
             var entity = new RecordEntity
             {
@@ -35,7 +39,9 @@ namespace ProjectManager.Domain.Services
                 Text = record.Text,
                 Type = record.Type
             };
-            return recordRepository.InsertAsync(entity, cancellationToken);
+            await recordRepository.InsertAsync(entity, cancellationToken);
+
+            return entity;
         }
 
         public async Task AddRecordsAsync(Guid taskId, IEnumerable<RecordModel> records, CancellationToken cancellationToken)

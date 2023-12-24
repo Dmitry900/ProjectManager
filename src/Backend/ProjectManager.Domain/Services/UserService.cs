@@ -11,14 +11,17 @@ namespace ProjectManager.Domain.Services
 
         #region IUserService members
 
-        public async Task CreateUserAsync(UserModel user, CancellationToken cancellationToken)
+        public async Task<UserEntity> CreateUserAsync(UserModel user, CancellationToken cancellationToken)
         {
-            await repository.InsertAsync(new UserEntity
+            var entity = new UserEntity
             {
                 UserId = Guid.NewGuid(),
                 Name = user.Name,
                 Pass = user.PassHash
-            }, cancellationToken);
+            };
+            await repository.InsertAsync(entity, cancellationToken);
+
+            return entity;
         }
 
         public async Task<UserModel> GetUserAsync(Guid userId, CancellationToken cancellationToken)

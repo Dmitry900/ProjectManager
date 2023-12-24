@@ -8,8 +8,9 @@ namespace ProjectManager.Domain.Tests
 {
     public abstract class TestBase : IAsyncLifetime
     {
-        readonly ServiceProvider serviceProvider;
+        static protected CancellationToken NonToken => CancellationToken.None;
 
+        readonly ServiceProvider serviceProvider;
         public IServiceProvider Services => serviceProvider;
         public IUnitOfWork UnitOfWork { get; }
 
