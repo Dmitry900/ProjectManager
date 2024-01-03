@@ -2,5 +2,5 @@
 
 namespace ProjectManager.Domain.Models
 {
-    public record RecordModel(RecordType Type, string Text);
+    public record RecordModel(Guid Id, RecordType Type, string Text);
 }

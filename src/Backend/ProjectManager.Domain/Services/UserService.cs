@@ -1,34 +1,33 @@
-﻿using ProjectManager.Domain.Abstractions.Services;
+﻿using ProjectManager.Domain.Abstractions.Context;
+using ProjectManager.Domain.Abstractions.Services;
 using ProjectManager.Domain.Entities;
-using ProjectManager.Domain.Models;
-using ProjectManager.Domain.UnitOfWork;
 
 namespace ProjectManager.Domain.Services
 {
-    internal class UserService(IUnitOfWork unitOfWork) : IUserService
+    internal class UserService(IUserContext userContext) : IUserService
     {
-        readonly IGenericRepository<UserEntity> repository = unitOfWork.UserRepository ?? throw new ArgumentNullException(nameof(unitOfWork));
+        readonly IUserContext userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
 
         #region IUserService members
 
-        public async Task<UserEntity> CreateUserAsync(UserModel user, CancellationToken cancellationToken)
+        public async Task<UserEntity> CreateUserAsync(string Name, string PassHash, CancellationToken cancellationToken)
         {
             var entity = new UserEntity
             {
                 UserId = Guid.NewGuid(),
-                Name = user.Name,
-                Pass = user.PassHash
+                Name = Name,
+                Pass = PassHash
             };
-            await repository.InsertAsync(entity, cancellationToken);
+            await userContext.Users.AddAsync(entity, cancellationToken);
 
             return entity;
         }
 
-        public async Task<UserModel> GetUserAsync(Guid userId, CancellationToken cancellationToken)
+        public async Task<UserEntity> GetUserAsync(Guid userId, CancellationToken cancellationToken)
         {
-            var user = await repository.GetByIdAsync(userId, cancellationToken);
+            var user = await userContext.Users.FindAsync(userId, cancellationToken);
 
-            return new(user.Name, user.Pass);
+            return user;
         }
 
         #endregion

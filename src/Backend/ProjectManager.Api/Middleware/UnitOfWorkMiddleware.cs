@@ -1,4 +1,4 @@
-﻿using ProjectManager.Domain.UnitOfWork;
+﻿using ProjectManager.Domain.Context;
 
 namespace ProjectManager.Api.Middleware
 {
@@ -6,12 +6,12 @@ namespace ProjectManager.Api.Middleware
     {
         readonly RequestDelegate next = next;
 
-        public async Task InvokeAsync(HttpContext context, IUnitOfWork unitOfWork)
+        public async Task InvokeAsync(HttpContext context, ApplicationContext appContext)
         {
             // Call the next delegate/middleware in the pipeline.
             await next(context);
 
-            await unitOfWork.SaveAsync(context.RequestAborted);
+            await appContext.SaveChangesAsync(context.RequestAborted);
         }
     }
 }

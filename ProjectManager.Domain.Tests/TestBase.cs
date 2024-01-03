@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ProjectManager.Domain.Context;
 using ProjectManager.Domain.Extensions;
-using ProjectManager.Domain.UnitOfWork;
 
 namespace ProjectManager.Domain.Tests
 {
@@ -12,18 +11,17 @@ namespace ProjectManager.Domain.Tests
 
         readonly ServiceProvider serviceProvider;
         public IServiceProvider Services => serviceProvider;
-        public IUnitOfWork UnitOfWork { get; }
+        public ApplicationContext Context { get; }
 
         public TestBase()
         {
             var services = new ServiceCollection();
 
-            services.AddDbContext<ApplicationContext>(options => options.UseInMemoryDatabase("test"));
-            services.AddSingleton<IUnitOfWork, Domain.UnitOfWork.UnitOfWork>();
+            services.AddContext(options => options.UseInMemoryDatabase("test"));
             services.AddProjectManager();
 
             serviceProvider = services.BuildServiceProvider();
-            UnitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+            Context = serviceProvider.GetRequiredService<ApplicationContext>();
         }
 
         #region Abstract 

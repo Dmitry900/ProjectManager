@@ -33,6 +33,14 @@ namespace ProjectManager.Domain.Context
             //optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;Database=SchoolDB;Trusted_Connection=True;");
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TaskEntity>()
+                    .HasMany(t => t.Records);
+
+            base.OnModelCreating(modelBuilder);
+        }
+
         #endregion
     }
 }

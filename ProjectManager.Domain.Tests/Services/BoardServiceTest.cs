@@ -5,26 +5,29 @@ namespace ProjectManager.Domain.Tests.Services
 {
     public class BoardServiceTest : TestBase
     {
+        readonly IUserService userService;
         readonly IBoardService boardService;
-        readonly ITaskService taskService;
         public BoardServiceTest()
         {
+            userService = Services.GetRequiredService<IUserService>();
             boardService = Services.GetRequiredService<IBoardService>();
-            taskService = Services.GetRequiredService<ITaskService>();
         }
 
         [Fact]
         public async Task Create_Success()
         {
-            var boardId = Guid.NewGuid();
-            await boardService.CreateAsync(new(boardId, "abc"), NonToken);
+            #region Preparation
 
-            await UnitOfWork.SaveAsync(NonToken);
-            var taskEntities = await UnitOfWork.TaskRepository.GetAsync();
-            Assert.Single(taskEntities);
-            var task = taskEntities.Single();
-            Assert.Equal(boardId, task.BoardId);
-            Assert.Equal("123", task.Name);
+            var user = await userService.CreateUserAsync("abc", "123", NonToken);
+
+            #endregion
+
+            var board = await boardService.CreateAsync(user.UserId, "Name", NonToken);
+
+            await Context.SaveChangesAsync(NonToken);
+            var boardEntity = await boardService.FindAsync(board.BoardId, NonToken);
+            Assert.Equal(board.BoardId, boardEntity.BoardId);
+            Assert.Equal("Name", boardEntity.Name);
         }
 
         [Fact]
@@ -32,35 +35,36 @@ namespace ProjectManager.Domain.Tests.Services
         {
             #region Preparation
 
-            var boardId = Guid.NewGuid();
-            var task = await boardService.CreateAsync(new(boardId, "abc"), NonToken);
+            var user = await userService.CreateUserAsync("abc", "123", NonToken);
+            var board = await boardService.CreateAsync(user.UserId, "abc", NonToken);
 
-            await UnitOfWork.SaveAsync(NonToken);
+            await Context.SaveChangesAsync(NonToken);
 
             #endregion
 
-            await boardService.DeleteAsync(task.BoardId, NonToken);
-            var taskEntities = await UnitOfWork.TaskRepository.GetAsync();
+            await boardService.DeleteAsync(board.BoardId, NonToken);
+            var boardEntity = await boardService.FindAsync(board.BoardId, NonToken);
 
-            Assert.Empty(taskEntities);
+            Assert.Null(boardEntity);
         }
 
         [Fact]
         public async Task GetAll_Success()
         {
-            var boardId = Guid.NewGuid();
-            await taskService.CreateAsync(new(boardId, "abc"), NonToken);
-            await taskService.CreateAsync(new(boardId, "abc1"), NonToken);
+            var user = await userService.CreateUserAsync("abc", "123", NonToken);
 
-            await UnitOfWork.SaveAsync(NonToken);
-            var taskEntities = await boardService.GetAllTasksAsync(boardId, NonToken);
+            var task1 = await boardService.CreateAsync(user.UserId, "abc", NonToken);
+            var task2 = await boardService.CreateAsync(user.UserId, "abc1", NonToken);
+
+            await Context.SaveChangesAsync(NonToken);
+            var taskEntities = await boardService.GetAllTasksAsync(user.UserId, NonToken);
             Assert.Collection(taskEntities, it =>
             {
-                Assert.Equal(boardId, it.BoardId);
+                Assert.Equal(user.UserId, it.BoardId);
                 Assert.Equal("abc", it.Name);
             }, it =>
             {
-                Assert.Equal(boardId, it.BoardId);
+                Assert.Equal(user.UserId, it.BoardId);
                 Assert.Equal("abc1", it.Name);
             });
         }
@@ -70,19 +74,19 @@ namespace ProjectManager.Domain.Tests.Services
         {
             #region Preparation
 
-            var boardId = Guid.NewGuid();
-            await taskService.CreateAsync(new(boardId, "abc"), NonToken);
+            var user = await userService.CreateUserAsync("abc", "123", NonToken);
+
+            var board = await boardService.CreateAsync(user.UserId, "abc", NonToken);
 
             #endregion
 
-            await boardService.AddStatusAsync(boardId, "new", NonToken);
+            await boardService.AddStatusAsync(board.BoardId, "new", NonToken);
 
-            await UnitOfWork.SaveAsync(CancellationToken.None);
-            var recordEntities = await UnitOfWork.BoardRepository.GetAsync();
-            var recordEntity = recordEntities.Single();
+            await Context.SaveChangesAsync(CancellationToken.None);
+            var boardEntity = await boardService.FindAsync(board.BoardId, NonToken);
 
-            Assert.Single(recordEntity.Statuses);
-            Assert.Equal("new", recordEntity.Statuses.Single());
+            Assert.Single(boardEntity.Statuses);
+            Assert.Equal("new", boardEntity.Statuses.Single());
         }
 
         [Fact]
@@ -90,18 +94,20 @@ namespace ProjectManager.Domain.Tests.Services
         {
             #region Preparation
 
-            var boardId = Guid.NewGuid();
-            await taskService.CreateAsync(new(boardId, "abc"), NonToken);
+            var user = await userService.CreateUserAsync("abc", "123", NonToken);
+
+            var board = await boardService.CreateAsync(user.UserId, "abc", NonToken);
 
 
-            await boardService.AddStatusAsync(boardId, "new", NonToken);
+            await boardService.AddStatusAsync(user.UserId, "new", NonToken);
 
             #endregion
-            await boardService.RemoveStatusAsync(boardId, "new", NonToken);
 
-            await UnitOfWork.SaveAsync(CancellationToken.None);
-            var recordEntities = await UnitOfWork.BoardRepository.GetAsync();
-            Assert.Empty(recordEntities);
+            await boardService.RemoveStatusAsync(user.UserId, "new", NonToken);
+
+            await Context.SaveChangesAsync(CancellationToken.None);
+            var boardEntity = await boardService.FindAsync(board.BoardId, NonToken);
+            Assert.Empty(boardEntity.Statuses);
         }
     }
 }

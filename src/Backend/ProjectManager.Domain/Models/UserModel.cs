@@ -1,4 +1,4 @@
 ﻿namespace ProjectManager.Domain.Models
 {
-    public record UserModel(string Name, string PassHash);
+    public record UserModel(Guid Id, string Name, string PassHash);
 }
