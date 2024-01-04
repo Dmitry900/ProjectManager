@@ -19,7 +19,7 @@ namespace ProjectManager.Domain.Tests.Services
             var createdUser = await userService.CreateUserAsync("Name", "123", NonToken);
 
             await Context.SaveChangesAsync(NonToken);
-            var user = await userService.GetUserAsync(createdUser.UserId, NonToken);
+            var user = await userService.FindUserAsync(createdUser.UserId, NonToken);
             Assert.NotNull(user);
             Assert.Equal("Name", user.Name);
             Assert.Equal("123", user.Pass);
@@ -33,7 +33,7 @@ namespace ProjectManager.Domain.Tests.Services
         {
             var createdUser = await userService.CreateUserAsync("Name", "123", NonToken);
 
-            var user = await userService.GetUserAsync(createdUser.UserId, CancellationToken.None);
+            var user = await userService.FindUserAsync(createdUser.UserId, CancellationToken.None);
             Assert.Equal("Name", user.Name);
             Assert.Equal("123", user.Pass);
         }

@@ -24,9 +24,11 @@ namespace ProjectManager.Domain.Services
         }
 
         // todo: дополнить и реализовать интерфейсы
-        public Task<TaskEntity> FindAsync(Guid taskId, CancellationToken cancellationToken)
+        async public Task<TaskEntity> FindAsync(Guid taskId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var task = await boardContext.Tasks.FindAsync(taskId, cancellationToken);
+
+            return task;
         }
 
         public async Task DeleteAsync(Guid taskId, CancellationToken cancellationToken)

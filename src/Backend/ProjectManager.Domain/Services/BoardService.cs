@@ -1,7 +1,6 @@
 ﻿using ProjectManager.Domain.Abstractions.Context;
 using ProjectManager.Domain.Abstractions.Services;
 using ProjectManager.Domain.Entities;
-using ProjectManager.Domain.Models;
 
 namespace ProjectManager.Domain.Services
 {
@@ -24,9 +23,11 @@ namespace ProjectManager.Domain.Services
 
             return entity;
         }
-        public Task<BoardEntity> UpdateAsync(BoardModel model, CancellationToken cancellationToken)
+        public async Task<BoardEntity> UpdateNameAsync(Guid boardId, string name, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var entity = await FindAsync(boardId, cancellationToken);
+            entity.Name = name;
+            return entity;
         }
 
         public async Task DeleteAsync(Guid boardId, CancellationToken cancellationToken)
@@ -35,29 +36,29 @@ namespace ProjectManager.Domain.Services
             boardContext.Boards.Remove(board);
         }
 
-        public Task<BoardEntity> FindAsync(Guid boardId, CancellationToken cancellationToken)
+        async public Task<BoardEntity> FindAsync(Guid boardId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var board = await boardContext.Boards.FindAsync(boardId, cancellationToken);
+
+            return board;
         }
 
         public async Task AddStatusAsync(Guid boardId, string status, CancellationToken cancellationToken)
         {
             var board = await boardContext.Boards.FindAsync(boardId, cancellationToken);
             board.Statuses.Add(status);
-            boardContext.Boards.Update(board);
         }
 
         public async Task RemoveStatusAsync(Guid boardId, string status, CancellationToken cancellationToken)
         {
             var board = await boardContext.Boards.FindAsync(boardId, cancellationToken);
             board.Statuses = board.Statuses.Where(it => it != status).ToList();
-            boardContext.Boards.Update(board);
         }
 
         public async Task<IEnumerable<TaskEntity>> GetAllTasksAsync(Guid boardId, CancellationToken cancellationToken)
         {
             var board = await boardContext.Boards.FindAsync(boardId, cancellationToken);
-            return board.Tasks;
+            return board?.Tasks;
         }
 
         #endregion

@@ -31,7 +31,7 @@ namespace ProjectManager.Domain.Tests.Services
             var taskEntity = await taskService.FindAsync(task.TaskId, NonToken);
             Assert.NotNull(taskEntity);
             Assert.Equal(task.BoardId, taskEntity.BoardId);
-            Assert.Equal("123", taskEntity.Name);
+            Assert.Equal("abc", taskEntity.Name);
         }
 
         [Fact]
@@ -42,12 +42,12 @@ namespace ProjectManager.Domain.Tests.Services
             var boardId = Guid.NewGuid();
             var task = await taskService.CreateAsync(boardId, "abc", NonToken);
 
-            await Context.SaveChangesAsync(NonToken);
-
             #endregion
 
             await taskService.DeleteAsync(task.TaskId, NonToken);
             var taskEntity = await taskService.FindAsync(task.TaskId, NonToken);
+
+            await Context.SaveChangesAsync(NonToken);
             Assert.Null(taskEntity);
         }
 
@@ -61,7 +61,7 @@ namespace ProjectManager.Domain.Tests.Services
 
             #endregion
 
-            var record = await taskService.AddRecordAsync(task.TaskId, Entities.RecordType.Text, "Abc", NonToken);
+            await taskService.AddRecordAsync(task.TaskId, Entities.RecordType.Text, "Abc", NonToken);
 
             await Context.SaveChangesAsync(CancellationToken.None);
             var taskEntity = await taskService.FindAsync(task.TaskId, NonToken);

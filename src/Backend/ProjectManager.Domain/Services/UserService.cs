@@ -23,7 +23,7 @@ namespace ProjectManager.Domain.Services
             return entity;
         }
 
-        public async Task<UserEntity> GetUserAsync(Guid userId, CancellationToken cancellationToken)
+        public async Task<UserEntity> FindUserAsync(Guid userId, CancellationToken cancellationToken)
         {
             var user = await userContext.Users.FindAsync(userId, cancellationToken);
 

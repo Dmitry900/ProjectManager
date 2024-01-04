@@ -35,8 +35,16 @@ namespace ProjectManager.Domain.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TaskEntity>()
-                    .HasMany(t => t.Records);
+            modelBuilder.Entity<UserEntity>().HasKey(e => e.UserId);
+            modelBuilder.Entity<UserEntity>().HasMany(e => e.Boards).WithOne().HasForeignKey(e => e.UserId);
+
+            modelBuilder.Entity<BoardEntity>().HasKey(e => e.BoardId);
+            modelBuilder.Entity<BoardEntity>().HasMany(e => e.Tasks).WithOne().HasForeignKey(e => e.BoardId).IsRequired();
+
+            modelBuilder.Entity<TaskEntity>().HasKey(e => e.TaskId);
+            modelBuilder.Entity<TaskEntity>().HasMany(e => e.Records).WithOne().HasForeignKey(e => e.TaskId).IsRequired();
+
+            modelBuilder.Entity<RecordEntity>().HasKey(e => e.RecordId);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -9,6 +9,6 @@ namespace ProjectManager.Domain.Entities
         public Guid BoardId { get; set; }
         public string Name { get; set; }
 
-        public ICollection<RecordEntity> Records { get; set; }
+        public ICollection<RecordEntity> Records { get; set; } = new List<RecordEntity>();
     }
 }
