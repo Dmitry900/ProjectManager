@@ -1,4 +1,4 @@
-﻿namespace ProjectManager.Domain.Models
+﻿namespace ProjectManager.Api.Models
 {
     public record BoardModel(Guid Id, Guid UserId, string Name);
 }
