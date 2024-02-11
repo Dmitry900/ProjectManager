@@ -5,7 +5,7 @@ namespace ProjectManager.Core.Context.Entities
     public class Project : IEntity
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
+        public string Title { get; set; }
         public string CustomerCompany { get; set; }
         public string PerformingCompany { get; set; }
         public DateTime StartDate { get; set; }
