@@ -6,10 +6,10 @@ namespace ProjectManager.Core.Repositories
     {
         IQueryable<TEntity> All { get; }
 
-        Task<TEntity> CreateAsync(TEntity entity, CancellationToken cancellationToken);
-        Task<TEntity> FindByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<bool> UpdateAsync(TEntity entity, CancellationToken cancellationToken);
-        Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken);
-        Task SaveChangesAsync(CancellationToken cancellationToken);
+        Task<TEntity> CreateAsync(TEntity entity, CancellationToken cancellationToken = default);
+        Task<TEntity> FindByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<bool> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
+        Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        Task SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
