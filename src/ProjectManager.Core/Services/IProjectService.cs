@@ -18,6 +18,7 @@ namespace ProjectManager.Core.Services
 
         // Update methods
         Task AddEmployeeAsync(Guid projectId, Guid employeeId, CancellationToken cancellationToken = default);
+        Task RemoveEmployeeAsync(Guid projectId, Guid employeeId, CancellationToken cancellationToken = default);
         Task SetDirectorAsync(Guid projectId, Guid directorId, CancellationToken cancellationToken = default);
         Task UpdateProjectAsync(ProjectModel project, CancellationToken cancellationToken = default);
 

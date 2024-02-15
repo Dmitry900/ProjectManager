@@ -4,6 +4,7 @@ using ProjectManager.Core;
 using ProjectManager.Core.Context;
 using ProjectManager.Core.Context.Entities;
 using ProjectManager.Core.Context.Entities.Interfaces;
+using ProjectManager.Core.Profiles;
 using ProjectManager.Core.Repositories;
 
 namespace ProjectManager.Tests
@@ -22,8 +23,10 @@ namespace ProjectManager.Tests
         {
             var services = new ServiceCollection();
 
-            services.AddContext(options => options.UseInMemoryDatabase("Test"))
+            services.AddContext(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()))
                     .AddApplicationServices();
+
+            services.AddAutoMapper(it => it.AddProfile<MappingProfile>());
 
             OnConfigure(services);
 
@@ -41,13 +44,12 @@ namespace ProjectManager.Tests
 
         public async Task InitializeAsync()
         {
-            await context.Database.EnsureDeletedAsync();
             await context.Database.EnsureCreatedAsync();
         }
 
-
         public async Task DisposeAsync()
         {
+            await context.Database.EnsureDeletedAsync();
             serviceScope.Dispose();
             await serviceProvider.DisposeAsync();
         }

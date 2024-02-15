@@ -76,10 +76,10 @@ namespace EmployeeManager.Tests.Services
             var entity = await Repository<Employee>().FindByIdAsync(employee.Id, CancellationToken.None);
             Assert.NotNull(entity);
 
-            Assert.Equal(entity.FirstName, employee.FirstName);
-            Assert.Equal(entity.LastName, employee.LastName);
-            Assert.Equal(entity.Patronymic, employee.Patronymic);
-            Assert.Equal(entity.Email, employee.Email);
+            Assert.Equal(entity.FirstName, updatedEmployee.FirstName);
+            Assert.Equal(entity.LastName, updatedEmployee.LastName);
+            Assert.Equal(entity.Patronymic, updatedEmployee.Patronymic);
+            Assert.Equal(entity.Email, updatedEmployee.Email);
         }
 
         [Fact]
@@ -101,20 +101,36 @@ namespace EmployeeManager.Tests.Services
 
         #region Query methods
 
-        static EmployeeModel[] Employees => [
+        static readonly EmployeeModel[] Employees = [
             new EmployeeModel(Guid.NewGuid(), "Ivanov", "Ivan", "Ivanovich", "Mail"),
             new EmployeeModel(Guid.NewGuid(), "Petrov", "Ivan", "Ivanovich", "Mail"),
             new EmployeeModel(Guid.NewGuid(), "Petrov", "Petr", "Ivanovich", "Mail"),
             new EmployeeModel(Guid.NewGuid(), "Olegov", "Oleg", "Petrovich", "Mail")
         ];
 
-        public static TheoryData<string, EmployeeModel[]> TestObject => new TheoryData<string, EmployeeModel[]>()
+        public static TheoryData<string, EmployeeModel[]> TestObject => new()
         {
-            { "Ivan", new EmployeeModel[] { Employees[0], Employees[1] } },
+            { "Ivan", new EmployeeModel[] { Employees[0], Employees[1], Employees[2] } },
             { "Ivanovich", new EmployeeModel[] { Employees[0], Employees[1], Employees[2] } },
-            { "Petr", new EmployeeModel[] {  Employees[1], Employees[2] } },
+            { "Petr", new EmployeeModel[] {  Employees[1], Employees[2], Employees[3] } },
             { "Oleg", new EmployeeModel[] { Employees[3] } }
         };
+
+        [Fact]
+        public async Task GetEmployeesAsync_Success()
+        {
+            // arrange
+            foreach (var employee in Employees)
+            {
+                await employeeService.CreateAsync(employee, CancellationToken.None);
+            }
+
+            // act
+            var collection = await employeeService.GetEmployeesAsync(2, 5);
+
+            // assert
+            Assert.Equal(2, collection.Count());
+        }
 
         [Theory]
         [MemberData(nameof(TestObject))]
@@ -130,7 +146,7 @@ namespace EmployeeManager.Tests.Services
             var variants = await employeeService.SearchByNameAsync(search);
 
             // assert
-            Assert.Equal(found.OrderDescending(), variants.OrderDescending());
+            Assert.Equal(found, variants);
         }
 
         #endregion
@@ -151,6 +167,7 @@ namespace EmployeeManager.Tests.Services
             };
             employee.Projects.AddRange([Project(), Project(), Project()]);
             await Repository<Employee>().CreateAsync(employee, CancellationToken.None);
+            await Repository<Employee>().SaveChangesAsync();
 
             // act
             var found = await employeeService.GetEmployeeProjectsAsync(employee.Id, CancellationToken.None);

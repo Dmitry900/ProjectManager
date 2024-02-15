@@ -12,6 +12,6 @@ namespace ProjectManager.Core.Context.Entities
         public DateTime EndDate { get; set; }
         public int Priority { get; set; }
         public Employee Director { get; set; }
-        public List<Employee> Employees { get; set; }
+        public List<Employee> Employees { get; set; } = [];
     }
 }

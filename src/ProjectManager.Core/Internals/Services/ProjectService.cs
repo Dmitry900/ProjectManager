@@ -42,7 +42,7 @@ namespace ProjectManager.Core.Internals.Services
         public async Task<IEnumerable<ProjectModel>> GetProjectsAsync(int skip = 0, int take = 10, ProjectOrderProperty orderProperty = ProjectOrderProperty.None, Order order = Order.Ascending, CancellationToken cancellationToken = default)
         {
             var projects = projectRepository.All;
-            if (orderProperty == ProjectOrderProperty.None)
+            if (orderProperty != ProjectOrderProperty.None)
                 if (order == Order.Ascending)
                     projects = OrderBy(projects, orderProperty);
                 else if (order == Order.Descending)
@@ -63,9 +63,9 @@ namespace ProjectManager.Core.Internals.Services
             var projects = projectRepository.All;
 
             if (searchDate == SearchDate.Start)
-                projects = projects.Where(it => it.StartDate > startDate);
+                projects = projects.Where(it => it.StartDate < startDate);
             else if (searchDate == SearchDate.End)
-                projects = projects.Where(it => it.EndDate > startDate);
+                projects = projects.Where(it => it.EndDate < startDate);
 
             return await projects.Select(it => mapper.Map<ProjectModel>(it)).ToListAsync(cancellationToken);
         }
@@ -97,22 +97,33 @@ namespace ProjectManager.Core.Internals.Services
 
         public async Task AddEmployeeAsync(Guid projectId, Guid employeeId, CancellationToken cancellationToken = default)
         {
-            var employee = await employeeRepository.FindByIdAsync(projectId, cancellationToken);
+            var employee = await employeeRepository.FindByIdAsync(employeeId, cancellationToken);
             var project = await projectRepository.FindByIdAsync(projectId, cancellationToken);
 
             project.Employees.Add(employee);
 
-            await employeeRepository.SaveChangesAsync(cancellationToken);
+            await projectRepository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task RemoveEmployeeAsync(Guid projectId, Guid employeeId, CancellationToken cancellationToken = default)
+        {
+            var employee = await employeeRepository.FindByIdAsync(employeeId, cancellationToken);
+            var project = await projectRepository.FindByIdAsync(projectId, cancellationToken);
+
+            project.Employees.Remove(employee);
+
+            await projectRepository.SaveChangesAsync(cancellationToken);
         }
 
         public async Task SetDirectorAsync(Guid projectId, Guid directorId, CancellationToken cancellationToken = default)
         {
-            var employee = await employeeRepository.FindByIdAsync(projectId, cancellationToken);
             var project = await projectRepository.FindByIdAsync(projectId, cancellationToken);
+            var employee = await employeeRepository.FindByIdAsync(directorId, cancellationToken);
 
             project.Director = employee;
 
-            await employeeRepository.SaveChangesAsync(cancellationToken);
+            await projectRepository.UpdateAsync(project, cancellationToken);
+            await projectRepository.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateProjectAsync(ProjectModel project, CancellationToken cancellationToken = default)
@@ -132,7 +143,9 @@ namespace ProjectManager.Core.Internals.Services
 
         public async Task DeleteAsync(Guid projectId, CancellationToken cancellationToken = default)
         {
-            await employeeRepository.DeleteAsync(projectId, cancellationToken);
+            await projectRepository.DeleteAsync(projectId, cancellationToken);
+
+            await projectRepository.SaveChangesAsync(cancellationToken);
         }
 
         #region Helpers 

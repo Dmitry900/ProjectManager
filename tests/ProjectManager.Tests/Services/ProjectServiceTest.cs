@@ -107,40 +107,45 @@ namespace ProjectManager.Services
         #region Query methods
 
         [Theory]
-        [InlineData(3, 0, 3)]
-        [InlineData(3, 1, 2)]
-        [InlineData(3, 2, 1)]
-        [InlineData(3, 3, 0)]
-        [InlineData(2, 1, 1)]
-        public async Task SearchByDatesAsync_Start_Success(int startDayOffset, int endDayOffset, int count)
+        [InlineData(0, 3)]
+        [InlineData(1, 2)]
+        [InlineData(2, 1)]
+        [InlineData(3, 0)]
+        public async Task SearchByDatesAsync_Start_Success(int startDayOffset, int count)
         {
-            // arrange
-            await Repository<Project>().CreateAsync(Project(startDate: DateTime.UtcNow.AddDays(-3)), CancellationToken.None);
-            await Repository<Project>().CreateAsync(Project(startDate: DateTime.UtcNow.AddDays(-2)), CancellationToken.None);
-            await Repository<Project>().CreateAsync(Project(startDate: DateTime.UtcNow.AddDays(-1)), CancellationToken.None);
+            var utcNow = DateTime.UtcNow;
 
+            // arrange
+            await Repository<Project>().CreateAsync(Project(startDate: utcNow.AddDays(-3)), CancellationToken.None);
+            await Repository<Project>().CreateAsync(Project(startDate: utcNow.AddDays(-2)), CancellationToken.None);
+            await Repository<Project>().CreateAsync(Project(startDate: utcNow.AddDays(-1)), CancellationToken.None);
+
+            await Repository<Project>().SaveChangesAsync();
             // act
-            var collection = await projectService.SearchByDatesAsync(DateTime.UtcNow.AddDays(-startDayOffset), DateTime.UtcNow.AddDays(-endDayOffset), SearchDate.Start);
+            var collection = await projectService.SearchByDatesAsync(utcNow.AddDays(-startDayOffset), SearchDate.Start);
 
             // assert
             Assert.Equal(count, collection.Count());
         }
 
         [Theory]
-        [InlineData(3, 0, 3)]
-        [InlineData(3, 1, 2)]
-        [InlineData(3, 2, 1)]
-        [InlineData(3, 3, 0)]
-        [InlineData(2, 1, 1)]
-        public async Task SearchByDatesAsync_End_Success(int startDayOffset, int endDayOffset, int count)
+        [InlineData(0, 3)]
+        [InlineData(1, 2)]
+        [InlineData(2, 1)]
+        [InlineData(3, 0)]
+        public async Task SearchByDatesAsync_End_Success(int startDayOffset, int count)
         {
+            var utcNow = DateTime.UtcNow;
+
             // arrange
-            await Repository<Project>().CreateAsync(Project(startDate: DateTime.UtcNow.AddDays(-10), endDate: DateTime.UtcNow.AddDays(-3)), CancellationToken.None);
-            await Repository<Project>().CreateAsync(Project(startDate: DateTime.UtcNow.AddDays(-10), endDate: DateTime.UtcNow.AddDays(-2)), CancellationToken.None);
-            await Repository<Project>().CreateAsync(Project(startDate: DateTime.UtcNow.AddDays(-10), endDate: DateTime.UtcNow.AddDays(-1)), CancellationToken.None);
+            await Repository<Project>().CreateAsync(Project(startDate: utcNow.AddDays(-10), endDate: utcNow.AddDays(-3)), CancellationToken.None);
+            await Repository<Project>().CreateAsync(Project(startDate: utcNow.AddDays(-10), endDate: utcNow.AddDays(-2)), CancellationToken.None);
+            await Repository<Project>().CreateAsync(Project(startDate: utcNow.AddDays(-10), endDate: utcNow.AddDays(-1)), CancellationToken.None);
+
+            await Repository<Project>().SaveChangesAsync();
 
             // act
-            var collection = await projectService.SearchByDatesAsync(DateTime.UtcNow.AddDays(-startDayOffset), DateTime.UtcNow.AddDays(-endDayOffset), SearchDate.End);
+            var collection = await projectService.SearchByDatesAsync(utcNow.AddDays(-startDayOffset), SearchDate.End);
 
             // assert
             Assert.Equal(count, collection.Count());
@@ -166,6 +171,8 @@ namespace ProjectManager.Services
             await Repository<Project>().CreateAsync(Project(9), CancellationToken.None);
             await Repository<Project>().CreateAsync(Project(10), CancellationToken.None);
 
+            await Repository<Project>().SaveChangesAsync();
+
             // act
             var collection = await projectService.SearchByPriorityAsync(5, options, CancellationToken.None);
 
@@ -174,7 +181,7 @@ namespace ProjectManager.Services
         }
 
 
-        static ProjectModel[] Projects => [
+        static ProjectModel[] Projects = [
             new ProjectModel(Guid.NewGuid(), "A", "A", "A", DateTime.UtcNow.AddDays(-15), DateTime.UtcNow.AddDays(-10), 1),
             new ProjectModel(Guid.NewGuid(), "B", "B", "B", DateTime.UtcNow.AddDays(-14), DateTime.UtcNow.AddDays(-9), 2),
             new ProjectModel(Guid.NewGuid(), "C", "C", "C", DateTime.UtcNow.AddDays(-13), DateTime.UtcNow.AddDays(-8), 3),
@@ -182,8 +189,6 @@ namespace ProjectManager.Services
             new ProjectModel(Guid.NewGuid(), "E", "E", "E", DateTime.UtcNow.AddDays(-11), DateTime.UtcNow.AddDays(-6), 5)
         ];
 
-
-        // todo придумать тест
         [Fact]
         public async Task GetProjectsAsync_Pagination_Success()
         {
@@ -236,12 +241,14 @@ namespace ProjectManager.Services
         {
             // arrange
             var project = Project();
-            await Repository<Project>().CreateAsync(Project(), CancellationToken.None);
+            await Repository<Project>().CreateAsync(project, CancellationToken.None);
+            await Repository<Project>().SaveChangesAsync();
 
             // act
             var found = await projectService.SearchByTitleAsync(project.Title, CancellationToken.None);
 
             // assert
+            Assert.NotNull(found);
             Assert.Equal(found.Title, project.Title);
         }
 
@@ -281,6 +288,7 @@ namespace ProjectManager.Services
                 },
             ]);
             await Repository<Project>().CreateAsync(project, CancellationToken.None);
+            await Repository<Project>().SaveChangesAsync();
 
             // act
             var found = await projectService.GetProjectsEmployeesAsync(project.Id, CancellationToken.None);
@@ -304,6 +312,7 @@ namespace ProjectManager.Services
                 Patronymic = "Test"
             };
             await Repository<Employee>().CreateAsync(employee, CancellationToken.None);
+            await Repository<Project>().SaveChangesAsync();
 
             // act
             await projectService.AddEmployeeAsync(project.Id, employee.Id);
@@ -317,7 +326,7 @@ namespace ProjectManager.Services
         }
 
         [Fact]
-        public async Task SetDirectorAsync_Success()
+        public async Task RemoveEmployeeAsync_Success()
         {
             // arrange
             var project = Project();
@@ -331,6 +340,34 @@ namespace ProjectManager.Services
                 Patronymic = "Test"
             };
             await Repository<Employee>().CreateAsync(employee, CancellationToken.None);
+            await Repository<Project>().SaveChangesAsync();
+
+            // act
+            await projectService.RemoveEmployeeAsync(project.Id, employee.Id);
+
+            // assert
+            var entity = await Repository<Project>().FindByIdAsync(project.Id, CancellationToken.None);
+            Assert.Empty(entity.Employees);
+        }
+
+        [Fact]
+        public async Task SetDirectorAsync_Success()
+        {
+            // arrange
+            var project = Project();
+            await Repository<Project>().CreateAsync(project, CancellationToken.None);
+            await Repository<Project>().SaveChangesAsync();
+
+            var employee = new Employee
+            {
+                Id = Guid.NewGuid(),
+                Email = "mail",
+                FirstName = "Test",
+                LastName = "Test",
+                Patronymic = "Test"
+            };
+            await Repository<Employee>().CreateAsync(employee, CancellationToken.None);
+            await Repository<Employee>().SaveChangesAsync();
 
             // act
             await projectService.SetDirectorAsync(project.Id, employee.Id);
